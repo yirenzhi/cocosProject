@@ -28,7 +28,7 @@ using namespace std;
 //_eventDispatcher->addEventListenerWithFixedPriority(listenerk, this);
 
 #define REPLACE_SCENE(__type__)\
-	if (CCScene *pScene =  CCTransitionFade::create(0.3f,__type__::createScene()))\
+	if (Scene *pScene =  TransitionFade::create(0.3f,__type__::createScene()))\
 {\
 	CCDirector::getInstance()->replaceScene(pScene);\
 }

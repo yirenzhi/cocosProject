@@ -17,5 +17,12 @@ public:
 	virtual void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
 	CREATE_FUNC(GameSceen);
 	CREATE_SCENE(GameSceen);
+
+	void start(Ref*);
+	void newGame(Ref*);
+	void regret(Ref*);
+	void pause(Ref*);
+	void difficulty(Ref*);
+	
 };
 
