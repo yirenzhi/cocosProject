@@ -21,8 +21,8 @@ bool FirstScene::init()
 	startBt->setPosition(Vec2(winSize.width/2,winSize.height/2));
 	addChild(startBt);
 	
-	setTouchEnabled(true);
-	setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
+	//setTouchEnabled(true);
+	//setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 	
 	ADD_TOUCH_ONE(FirstScene);
 	return true;

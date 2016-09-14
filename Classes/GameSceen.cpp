@@ -1,5 +1,7 @@
 #include "GameSceen.h"
 #include "FirstScene.h"
+#include <functional>
+#include <algorithm>
 const string GameSceenPath="gameScreen/";
 
 bool GameSceen::init()
@@ -35,29 +37,46 @@ bool GameSceen::init()
 	addChild(qipan);
 
 
-	//棋子
 
 	//菜单
+	//新局   //开始  //悔棋   //暂停  //难度
 	auto menu = Menu::create();
 	addChild(menu);
 
-	//新局
-	auto newGame = MenuItemImage::create(GameSceenPath+"new.jpg",GameSceenPath+"new.jpg",CC_CALLBACK_1(GameSceen::start,this));
-	menu->addChild(newGame);
-	newGame->setPosition(Vec2(220,120));
+	string menusImage[] = {"new","start","regret","pause","difficulty"};
+	int len = sizeof(menusImage)/sizeof(menusImage[0]);
 
-	//开始
-	auto itemStart = MenuItemImage::create(GameSceenPath+"start.jpg",GameSceenPath+"start.jpg",CC_CALLBACK_1(GameSceen::start,this));
-	menu->addChild(itemStart);
-	itemStart->setPosition(Vec2(220,120));
 
-	//悔棋
+//	std::function<void(Ref*)> bind_func = CC_CALLBACK_1(GameSceen::start,this);
+	//vector<const ccMenuCallback&>  callbackFuc;
+	vector<std::function<void(Ref*)>>  callbackFuc;
 
-	//暂停
+	callbackFuc.push_back(CC_CALLBACK_1(GameSceen::newGame,this));
+	callbackFuc.push_back(CC_CALLBACK_1(GameSceen::start,this));
+	callbackFuc.push_back(CC_CALLBACK_1(GameSceen::regret,this));
+	callbackFuc.push_back(CC_CALLBACK_1(GameSceen::pause ,this));
+	callbackFuc.push_back(CC_CALLBACK_1(GameSceen::difficulty,this));
+	for (int i=0;i<len;i++)
+	{
+		auto newGame = MenuItemImage::create(GameSceenPath+menusImage[i]+".jpg",GameSceenPath+menusImage[i]+".jpg",callbackFuc[i]);
+		menu->addChild(newGame);
+		newGame->setPosition(Vec2(280,220-i*80));
+	}
 
-	//难度
+	//棋子
+	for(int i=0;i<32;i++)
+	{
+		auto stone = Stone::create(i);
+		addChild(stone);
+		vecStone.push_back(stone);
+	}
+
 
 	return true;
+}
+void GameSceen::update(float delta)
+{
+
 }
 
 void GameSceen::start(Ref*)
@@ -85,8 +104,19 @@ void GameSceen::difficulty(Ref*)
 
 bool GameSceen::onTouchBegan(Touch *touch, Event *unused_event)
 {
+	//Vec2 point = convertToNodeSpace(touch);
+	auto pos = touch->getLocationInView();
+
+
 	return true;
 }
+
+Vec2 GameSceen::getPlatePos(int x,int y)
+{
+
+}
+
+
 void GameSceen::onTouchEnded(Touch *touch, Event *unused_event)
 {
 
