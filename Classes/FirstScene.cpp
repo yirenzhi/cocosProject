@@ -36,16 +36,46 @@ bool FirstScene::onTouchBegan(Touch *touch, Event *unused_event)
 }
 void FirstScene::onTouchEnded(Touch *touch, Event *unused_event)
 {
-	auto pos = touch->getLocationInView();
-	pos = startBt->convertToNodeSpace(pos);
-	CCSize sz = startBt->getTexture()->getContentSizeInPixels();
-	CCRect rect = CCRectMake(0,0,sz.width,sz.height);
- 
-	if (rect.containsPoint(pos))
-	{
-		log("ok");
+// 	auto pos = touch->getLocationInView();
+// 	pos = startBt->convertToNodeSpace(pos);
+// 	CCSize sz = startBt->getTexture()->getContentSizeInPixels();
+// 	CCRect rect = CCRectMake(0,0,sz.width,sz.height);
+//  
+// 	if (rect.containsPoint(pos))
+// 	{
+// 		log("ok");
+// 
+// 		REPLACE_SCENE(GameSceen);
+// 
+// 	}
+	HttpRequest* request = new HttpRequest();
+	request->setUrl("http://www.baidu.com");
+	request->setRequestType(HttpRequest::Type::GET);
+	request->setResponseCallback(CC_CALLBACK_2(FirstScene::callback,this));
+	request->setTag("GET baidu test");
+	HttpClient::getInstance()->send(request);
+	request->release();
 
-		REPLACE_SCENE(GameSceen);
-
-	}
 }
+
+void FirstScene::callback(HttpClient *sender,HttpResponse *response)
+{
+	if (!response)
+	{
+		return;
+	}
+	if (0==response->getHttpRequest()->getTag())
+	{
+		log("%s completed",response->getHttpRequest()->getTag());
+	}
+	int status =response->getResponseCode();
+	if (!response->isSucceed())
+	{
+		log("response failed");
+		log("estatus=%d ,rror buffer:%s",status,response->getErrorBuffer());
+	}
+	std::vector<char>* buffer = response->getResponseData();
+	std::string temp(buffer->begin(),buffer->end());
+	log("httpReceived:[%s]|%s",response->getHttpRequest()->getTag(),temp.c_str());
+}
+

@@ -1,7 +1,9 @@
 #pragma once
 #include "cocos2d.h"
 #include <iostream>
-
+#include <algorithm>
+#include "network/HttpClient.h"
+using namespace cocos2d::network;
 using namespace std;
 #define CREATE_SCENE(__type__)\
 	static cocos2d::Scene* createScene()\
