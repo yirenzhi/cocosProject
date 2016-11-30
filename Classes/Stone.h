@@ -10,13 +10,14 @@ public:
 	~Stone(void);
 	//棋子类型  将，士，相，马，车，炮，兵
 	enum StoneType{ JIANG,SHI,XINAG,MA,CHE,PAO,BING };
+	enum ColorType{RED,BLACK};
 	static Stone* create(int id);
 
 	CC_SYNTHESIZE(StoneType,_type,Type);
 	CC_SYNTHESIZE(int ,_id,Id);
 	CC_SYNTHESIZE(int , _x,X);
 	CC_SYNTHESIZE(int , _y,Y);
-
+	CC_SYNTHESIZE(ColorType,_color,ColorT)
 	static struct initAttribute
 	{
 		int x;
@@ -24,6 +25,9 @@ public:
 		Stone::StoneType type;
 	}_initAttribute[16];
 	void setPos(int x,int y);
+	static Vec2 jiange ;
+	static Vec2 initialPos;
+
 private:
 	bool init(int id);
 };

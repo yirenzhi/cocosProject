@@ -19,8 +19,8 @@ const string stonePic[14]={
 };
 
 
-Vec2  jiange = Vec2(61,61);
-Vec2 initialPos = Vec2(83,46);
+Vec2 Stone::jiange = Vec2(61,61);
+Vec2 Stone::initialPos = Vec2(83,46);
 
 Stone::Stone(void)
 {
@@ -41,7 +41,14 @@ Stone* Stone::create(int id)
 
 bool Stone::init(int id)
 {
-
+	if (id<16)
+	{
+		setColorT(Stone::RED);
+	}
+	else
+	{
+		setColorT(Stone::BLACK);
+	}
 	setId(id);
 	
 	int type_id = id<16?id:id-16;
@@ -53,6 +60,7 @@ bool Stone::init(int id)
 	Sprite::initWithFile("stone/"+stonePic[p_id]);
 	int pos_y = id<16?getY():9-getY();
 	setPos(getX(),pos_y);
+	setY(pos_y);
 	setScale(0.9);
 	return true;
 }

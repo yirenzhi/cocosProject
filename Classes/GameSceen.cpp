@@ -25,7 +25,6 @@ bool GameSceen::init()
 	_stoneSpace=61;
 	_isSelected=false;
 	focus=NULL;
-	_isSelected=false;
 	//桌子
 	auto zhuozi = Sprite::create(GameSceenPath+"floor.jpg");
 	zhuozi->setPosition(Vec2(winSize.width/2,winSize.height/2));
@@ -89,6 +88,10 @@ bool GameSceen::onTouchBegan(Touch *touch, Event *unused_event)
 	
 	int selectId = getStoneID(x,y);
 	
+	if (selectId==focusId)
+	{
+		return false;
+	}
 	if (_isSelected)//已经有棋子选中
 	{
 		moveStone(x,y);
@@ -97,6 +100,7 @@ bool GameSceen::onTouchBegan(Touch *touch, Event *unused_event)
 	{
 		if (selectId!=-1)
 		{
+			focusId=selectId;
 			changeFocus(x,y);
 		}
 	}
@@ -114,7 +118,7 @@ Vec2 GameSceen::getPlatePos(int x,int y)
 
 int GameSceen::getStoneID(int x,int y)
 {
-	for (int i=0;i<vecStone.size();i++)
+	for (unsigned int i=0;i<vecStone.size();i++)
 	{
 		if (x==vecStone[i]->getX()&&y==vecStone[i]->getY())
 		{
@@ -155,19 +159,104 @@ bool GameSceen::getClickPos(Vec2 point, int &x, int &y)
 
 void GameSceen::moveStone(int x,int y)
 {
-	for (int i=0;i<vecStone.size();i++)
+	for (unsigned int i=0;i<vecStone.size();i++)
 	{
 		if (vecStone[i]->getPosition()==focus->getPosition())
 		{
-			vecStone[i]->setX(x);
-			vecStone[i]->setY(y);
-			vecStone[i]->setPosition(getPlatePos(x,y));
-			focus->setPosition(getPlatePos(x,y));
-			_isSelected=false;
+			if (canMove(vecStone[i],x,y))
+			{
+				vecStone[i]->setX(x);
+				vecStone[i]->setY(y);
+				vecStone[i]->setPosition(getPlatePos(x,y));
+				focusId = getStoneID(x,y);
+				focus->setPosition(getPlatePos(x,y));
+				_isSelected=false;
+			}
 		}
 	}
 }
+bool	GameSceen::canMove(Stone* sto,int x,int y)
+{
+	//判断目标没有自己家的棋子
+	int moveId = getStoneID(x,y);
+	if (moveId!=-1)
+	{
+		if (sto->getColorT()==vecStone[moveId]->getColorT())
+		{
+			return false;
+		}
+	}
 
+	switch (sto->getType())
+	{
+	case Stone::JIANG:
+		{
+			//将要在中间区域内行动
+			if (x>=3&&x<=5&&y>=0&&y<=2)
+			{
+
+			}
+		}
+		break;
+	case Stone::SHI:
+		{
+
+		}
+		break;
+	case Stone::XINAG:
+		{
+
+		}
+		break;
+	case Stone::MA:
+		{
+
+		}
+		break;
+	case Stone::CHE:
+		{
+			if (sto->getY==y||sto->getX()==x)
+			{
+				return true;
+			}
+		}
+		break;
+	case Stone::PAO:
+		{
+
+		}
+		break;
+	case Stone::BING:
+		{
+			if (sto->getColorT()==Stone::RED)
+			{
+				if (sto->getY()==y-1&&sto->getX()==x)
+				{
+					return true;
+				}
+				else if (sto->getY()>4)
+				{
+					if (sto->getY()==y&&abs(sto->getX-x)==1)
+					{
+						return true;
+					}
+				}
+
+				if (sto->getY()<=4)
+				{
+				}
+			}
+			if (sto->getY()==y-1&&sto->getX()==x)
+			{
+				return true;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+	return false;
+}
 void GameSceen::onTouchEnded(Touch *touch, Event *unused_event)
 {
 
