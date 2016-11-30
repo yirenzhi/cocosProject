@@ -21,8 +21,8 @@ bool FirstScene::init()
 	startBt->setPosition(Vec2(winSize.width/2,winSize.height/2));
 	addChild(startBt);
 	
-	//setTouchEnabled(true);
-	//setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
+
+	auto _emitter = ParticleSystemQuad::createWithTotalParticles(50);
 	
 	ADD_TOUCH_ONE(FirstScene);
 	return true;
@@ -36,26 +36,23 @@ bool FirstScene::onTouchBegan(Touch *touch, Event *unused_event)
 }
 void FirstScene::onTouchEnded(Touch *touch, Event *unused_event)
 {
-// 	auto pos = touch->getLocationInView();
-// 	pos = startBt->convertToNodeSpace(pos);
-// 	CCSize sz = startBt->getTexture()->getContentSizeInPixels();
-// 	CCRect rect = CCRectMake(0,0,sz.width,sz.height);
-//  
-// 	if (rect.containsPoint(pos))
-// 	{
-// 		log("ok");
-// 
-// 		REPLACE_SCENE(GameSceen);
-// 
-// 	}
-	HttpRequest* request = new HttpRequest();
-	request->setUrl("http://www.baidu.com");
-	request->setRequestType(HttpRequest::Type::GET);
-	request->setResponseCallback(CC_CALLBACK_2(FirstScene::callback,this));
-	request->setTag("GET baidu test");
-	HttpClient::getInstance()->send(request);
-	request->release();
+	auto pos = touch->getLocationInView();
+	pos = startBt->convertToNodeSpace(pos);
+	Size sz = startBt->getTexture()->getContentSizeInPixels();
+	Rect rect = Rect(0,0,sz.width,sz.height);
+	if (rect.containsPoint(pos))
+	{
+		log("ok");
+		REPLACE_SCENE(GameSceen);
+	}
 
+// 	HttpRequest* request = new HttpRequest();
+// 	request->setUrl("http://www.holyblade.com");
+// 	request->setRequestType(HttpRequest::Type::GET);
+// 	request->setResponseCallback(CC_CALLBACK_2(FirstScene::callback,this));
+// 	request->setTag("GET baidu test");
+// 	HttpClient::getInstance()->send(request);
+// 	request->release();
 }
 
 void FirstScene::callback(HttpClient *sender,HttpResponse *response)
