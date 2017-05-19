@@ -72,6 +72,8 @@ bool GameSceen::init()
 		addChild(stone);
 		vecStone.push_back(stone);
 	}
+
+	curMoveType=Stone::RED;
 	return true;
 }
 
@@ -87,19 +89,26 @@ bool GameSceen::onTouchBegan(Touch *touch, Event *unused_event)
 	}
 	
 	int selectId = getStoneID(x,y);
-	
+// 	if ()
+// 	{
+// 	}
 	if (selectId==focusId)
 	{
 		return false;
 	}
 	if (_isSelected)//已经有棋子选中
 	{
-		moveStone(x,y);
+		moveStone(focusId,x,y);
 	}
 	else//没有棋子选中
 	{
 		if (selectId!=-1)
 		{
+			//如果选中的棋子不是要走的那一家则无法行动
+			if (vecStone[selectId]->getColorT()!=curMoveType)
+			{
+				return true;
+			}
 			focusId=selectId;
 			changeFocus(x,y);
 		}
@@ -157,21 +166,30 @@ bool GameSceen::getClickPos(Vec2 point, int &x, int &y)
 	return false;
 }
 
-void GameSceen::moveStone(int x,int y)
+void GameSceen::moveStone(int selectId,int x,int y)
 {
-	for (unsigned int i=0;i<vecStone.size();i++)
+	if (canMove(vecStone[selectId],x,y))
 	{
-		if (vecStone[i]->getPosition()==focus->getPosition())
+		//吃子
+		int moveId = getStoneID(x,y);
+		if (moveId!=-1)
 		{
-			if (canMove(vecStone[i],x,y))
-			{
-				vecStone[i]->setX(x);
-				vecStone[i]->setY(y);
-				vecStone[i]->setPosition(getPlatePos(x,y));
-				focusId = getStoneID(x,y);
-				focus->setPosition(getPlatePos(x,y));
-				_isSelected=false;
-			}
+			reMove(moveId);
+		}
+		//移动棋子
+		vecStone[selectId]->setX(x);
+		vecStone[selectId]->setY(y);
+		vecStone[selectId]->setPosition(getPlatePos(x,y));
+		focusId = getStoneID(x,y);
+		focus->setPosition(getPlatePos(x,y));
+		_isSelected=false;
+		if (curMoveType==Stone::RED)
+		{
+			curMoveType=Stone::BLACK;
+		}
+		else
+		{
+			curMoveType=Stone::RED;
 		}
 	}
 }
@@ -183,72 +201,279 @@ bool	GameSceen::canMove(Stone* sto,int x,int y)
 	{
 		if (sto->getColorT()==vecStone[moveId]->getColorT())
 		{
+			//将光标移动过来
+			focusId=moveId;
+			changeFocus(x,y);
+
 			return false;
 		}
 	}
-
+	int stoX=sto->getX();
+	int stoY=sto->getY();
 	switch (sto->getType())
 	{
 	case Stone::JIANG:
 		{
-			//将要在中间区域内行动
-			if (x>=3&&x<=5&&y>=0&&y<=2)
+			if (sto->getColorT()==Stone::RED)
 			{
-
+				//帅要在中间区域内行动
+				if (x>=3&&x<=5&&y>=0&&y<=2)
+				{
+					//帅只能移动一步，将要移动的位置只能是他四周的点
+					if ((stoX==x&&abs(stoY-y)==1)||(stoY==y&&abs(stoX-x)==1))
+					{
+						return true;
+					}
+				}
+			}
+			else
+			{
+				//将要在中间区域内行动
+				if (x>=3&&x<=5&&y>=7&&y<=9)
+				{
+					//将只能移动一步，将要移动的位置只能是他四周的点
+					if ((stoX==x&&abs(stoY-y)==1)||(stoY==y&&abs(stoX-x)==1))
+					{
+						return true;
+					}
+				}
 			}
 		}
 		break;
 	case Stone::SHI:
-		{
-
+		{ 
+			if (sto->getColorT()==Stone::RED)
+			{
+				//红士要在中间区域内行动
+				if (x>=3&&x<=5&&y>=0&&y<=2)
+				{
+					//士只能移动一步，将要移动的位置只能是他四周的点
+					if (abs(stoX-x)==1&&abs(stoY-y)==1)
+					{
+						return true;
+					}
+				}
+			}
+			else
+			{
+				//黑士要在中间区域内行动
+				if (x>=3&&x<=5&&y>=7&&y<=9)
+				{
+					//士只能移动一步，将要移动的位置只能是他四周的点
+					if (abs(stoX-x)==1&&abs(stoY-y)==1)
+					{
+						return true;
+					}
+				}
+			}
 		}
 		break;
 	case Stone::XINAG:
 		{
-
+			if (sto->getColorT()==Stone::RED)
+			{
+				//红象要在中间区域内行动
+				if (x>=0&&x<=8&&y>=0&&y<=4)
+				{
+					//象只能移动一步，将要移动的位置只能是他四周的点
+					if (abs(stoX-x)==2&&abs(stoY-y)==2)
+					{
+						return true;
+					}
+				}
+			}
+			else
+			{
+				//黑象要在中间区域内行动
+				if (x>=0&&x<=8&&y>=5&&y<=9)
+				{
+					//象只能移动一步，将要移动的位置只能是他四周的点
+					if (abs(stoX-x)==2&&abs(stoY-y)==2)
+					{
+						return true;
+					}
+				}
+			}
 		}
 		break;
 	case Stone::MA:
 		{
-
+			//马飞日，且不能憋马腿
+			if (stoY+2==y&&abs(stoX-x)==1&&getStoneID(stoX,stoY+1)==-1)//向上飞
+			{
+				return true;
+			}
+			else if (stoY-2==y&&abs(stoX-x)==1&&getStoneID(stoX,stoY-1)==-1)//向下飞
+			{
+				return true;
+			}
+			else if (stoX-2==x&&abs(stoY-y)==1&&getStoneID(stoX-1,stoY)==-1)//向左飞
+			{
+				return true;
+			}
+			else if (stoX+2==x&&abs(stoY-y)==1&&getStoneID(stoX+1,stoY)==-1)//向右飞
+			{
+				return true;
+			}
 		}
 		break;
 	case Stone::CHE:
 		{
-			if (sto->getY==y||sto->getX()==x)
+			if (stoY==y&&stoX!=x)//水平移动
 			{
+				if (x>stoX)
+				{
+					for (int i=stoX+1;i<x;i++)
+					{
+						if (getStoneID(i,stoY)!=-1)
+						{
+							return false;
+						}
+					}
+				}
+				else
+				{
+					for (int i=stoX-1;i>x;i--)
+					{
+						if (getStoneID(i,stoY)!=-1)
+						{
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+			else if(stoX==x&&stoY!=y)
+			{
+				if (y>stoY)
+				{
+					for (int i=stoY+1;i<y;i++)
+					{
+						if (getStoneID(stoX,i)!=-1)
+						{
+							return false;
+						}
+					}
+				}
+				else
+				{
+					for (int i=stoY-1;i>y;i--)
+					{
+						if (getStoneID(stoX,i)!=-1)
+						{
+							return false;
+						}
+					}
+				}
 				return true;
 			}
 		}
 		break;
 	case Stone::PAO:
 		{
-
+			if (stoY==y&&stoX!=x)//水平移动
+			{
+				int num=0;
+				if (x>stoX)
+				{
+					for (int i=stoX+1;i<x;i++)
+					{
+						if (getStoneID(i,stoY)!=-1)
+						{
+							num++;
+						}
+					}
+				}
+				else
+				{
+					for (int i=stoX-1;i>x;i--)
+					{
+						if (getStoneID(i,stoY)!=-1)
+						{
+							num++;
+						}
+					}
+				}
+				if (num==0)
+				{
+					return true;
+				}
+				else if (num==1)
+				{
+					//炮打间隔的棋子
+					if (getStoneID(x,y)!=-1)
+					{
+						return true;
+					}
+				}
+			}
+			else if(stoX==x&&stoY!=y)
+			{
+				int num=0;
+				if (y>stoY)
+				{
+					for (int i=stoY+1;i<y;i++)
+					{
+						if (getStoneID(stoX,i)!=-1)
+						{
+							num++;
+						}
+					}
+				}
+				else
+				{
+					for (int i=stoY-1;i>y;i--)
+					{
+						if (getStoneID(stoX,i)!=-1)
+						{
+							num++;
+						}
+					}
+				}
+				if (num==0)
+				{
+					return true;
+				}
+				else if (num==1)
+				{
+					//炮打间隔的棋子
+					if (getStoneID(x,y)!=-1)
+					{
+						return true;
+					}
+				}
+			}
 		}
 		break;
 	case Stone::BING:
 		{
 			if (sto->getColorT()==Stone::RED)
 			{
-				if (sto->getY()==y-1&&sto->getX()==x)
+				if (stoY==y-1&&stoX==x)
 				{
 					return true;
 				}
-				else if (sto->getY()>4)
+				else if (stoY>4)
 				{
-					if (sto->getY()==y&&abs(sto->getX-x)==1)
+					if (stoY==y&&abs(stoX-x)==1)
 					{
 						return true;
 					}
 				}
-
-				if (sto->getY()<=4)
-				{
-				}
 			}
-			if (sto->getY()==y-1&&sto->getX()==x)
+			else
 			{
-				return true;
+				if (stoY==y+1&&stoX==x)
+				{
+					return true;
+				}
+				else if (stoY<=4)
+				{
+					if (stoY==y&&abs(stoX-x)==1)
+					{
+						return true;
+					}
+				}
 			}
 		}
 		break;
@@ -257,6 +482,15 @@ bool	GameSceen::canMove(Stone* sto,int x,int y)
 	}
 	return false;
 }
+
+void GameSceen::reMove(int removeId)
+{
+	vecStone[removeId]->removeFromParent();
+	//在vector中删除吃掉的子
+	std::vector<Stone *>::iterator iter=std::find(vecStone.begin(),vecStone.end(),vecStone[removeId]);
+	vecStone.erase(iter);
+}
+
 void GameSceen::onTouchEnded(Touch *touch, Event *unused_event)
 {
 
