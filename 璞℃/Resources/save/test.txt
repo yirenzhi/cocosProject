@@ -1,0 +1,8 @@
+vecDownLoadSprite = [17](0x0679f080 {isShow=false father=0x00000000 selectScale=1.10000002 ...},0x067568f8 {isShow=true father=0xfeeefeee selectScale=-1.58839967e+038 ...},0x0084b608 {isShow=false father=0x00000000 selectScale=1.10000002 ...},0x0679a8a0 {isShow=false father=0x...
+
+
+
+ 0    "homePage/icon/5/fl_zbsq.png"	
+
+ 
+2  "F:/cocos2dx/cocos2d-x-2.2.2_change_orgcocos2dxlib/cocos2d-x-2.2.2/projects/MonthlyPlatform2.0/proj.win32/Debug.win32/homePage/icon/5/fl_zzx.png"	
