@@ -16,5 +16,6 @@ private:
 	std::vector<std::vector <Cell*> > vectorCe;
 	int cells[16][16] = { 0 };
 
+	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event);
+	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event);
 };
-

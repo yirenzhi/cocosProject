@@ -1,12 +1,18 @@
 #include "Cell.h"
 
+std::vector <cocos2d::Texture2D*> Cell::vecBatch;
 
 
-Cell::Cell()
+void Cell::changeImage()
 {
+	if (!_type)
+	{
+		_type = true;
+		setTexture(vecBatch[_id]);
+	}
 }
 
-
-Cell::~Cell()
+void Cell::changeImage(cocos2d::Texture2D* text1)
 {
+	setTexture(text1);
 }

@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include<iostream>
 USING_NS_CC;
+const int numX = 16;
+const int numY = 16;
+const int numCell = 40;
 
 Scene* GameScene::createScene()
 {
@@ -11,9 +14,7 @@ Scene* GameScene::createScene()
 
 bool GameScene::init()
 {
-
-	const int numCell = 40;
-
+	//初始化雷的分布
 	int changeNum = 0;
 	while (changeNum<numCell)
 	{
@@ -26,24 +27,57 @@ bool GameScene::init()
 			changeNum++;
 		}
 	}
-
-	for (size_t i = 0; i < 16; i++)
+	std::vector <int>	nnn = { 1,2 };
+	for (size_t i = 0; i < numX; i++)
 	{
-		for (size_t j = 0; j < 16; j++)
-		{
-			std::cout << cells[j][i]<<"\t";
+		for (size_t j = 0; j < numY; j++)
+		{	
+			if (cells[i][j]==-1)
+			{
+				continue;
+			}
+			int count = 0;
+			if (i==0&&j==0)
+			{
+				count = cells[i][j + 1] + cells[i + 1][j] + cells[i + 1][j + 1];
+			}
+			if (i==0&&j!=0&&j!=15)
+			{
+
+			}
+			
 		}
-		std::cout << std::endl;
 	}
+
 	auto lay1 = Layer::create();
 	addChild(lay1);
 	lay1->setPosition(100, 100);
-	//创建所有的雷
-	//
+
+	//给精灵帧赋值
+	for (size_t i = 0; i < 11; i++)
+	{
+		char buffer[128];
+		if (i<9)
+		{
+			sprintf(buffer, "game/%d.jpg", i);
+		}
+		else if (i==9)
+		{
+			sprintf(buffer, "game/%c.jpg", 's');
+		}
+		else if(i==10)
+		{
+			sprintf(buffer, "game/%s.jpg", 'bomb');
+		}
+		SpriteBatchNode* bNode = SpriteBatchNode::create(buffer);
+		addChild(bNode);
+		Cell::vecBatch.push_back(bNode->getTexture());
+	}
 	SpriteBatchNode* bNode = SpriteBatchNode::create("game/0.jpg");
 	addChild(bNode);
-	const int numX = 16;
-	const int numY = 16;
+	//创建所有的雷
+	//
+
 	for (size_t i = 0; i < numY; i++)
 	{
 		std::vector<Cell*> vec1;
@@ -52,13 +86,13 @@ bool GameScene::init()
 		{
 			//auto p = Sprite::createWithTexture(bNode->getTexture());
 			//auto p = Sprite::create("game/0.jpg");
-			auto p = Cell::create(bNode->getTexture());
+			auto p = new Cell;
 			lay1->addChild(p);
 			p->setPosition(21*j, 21*i);
 			vectorCe[i].push_back(p);
 		}
 	}
-
+	//增加返回到上一个界面的菜单
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -83,9 +117,11 @@ bool GameScene::init()
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 1);
 
-	//auto p = Sprite::create("game/s.jpg");
-	//addChild(p);
-	//p->setPosition(300, 300);
+	//增加触摸机制
+	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create(); 
+		listener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this); 
+		listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this); 
+		_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 	return true;
 }
 
@@ -99,3 +135,31 @@ void GameScene::menuBackCallback(Ref* pSender)
 	}
 }
 
+bool GameScene::onTouchBegan(Touch *touch, Event *event)
+{
+	//触摸判断
+	for (size_t i = 0; i < 16; i++)
+	{
+		for (size_t j = 0; j < 16; j++)
+		{
+			auto pos = touch->getLocationInView();
+			pos = Director::getInstance()->convertToGL(pos);
+
+			pos = vectorCe[i][j]->convertToNodeSpace(pos);
+			Size sz = vectorCe[i][j]->getTexture()->getContentSizeInPixels();
+			Rect rect = Rect(0, 0, sz.width, sz.height);
+			if (rect.containsPoint(pos))
+			{
+				log("ok");
+				vectorCe[i][j]->changeImage();
+			}
+		}
+	}
+
+	return true;
+}
+void GameScene::onTouchEnded(Touch *touch, Event *event)
+{
+
+
+}
