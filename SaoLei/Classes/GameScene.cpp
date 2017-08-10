@@ -27,7 +27,8 @@ bool GameScene::init()
 			changeNum++;
 		}
 	}
-	std::vector <int>	nnn = { 1,2 };
+
+
 	for (size_t i = 0; i < numX; i++)
 	{
 		for (size_t j = 0; j < numY; j++)
@@ -37,15 +38,17 @@ bool GameScene::init()
 				continue;
 			}
 			int count = 0;
-			if (i==0&&j==0)
+			//计算每个格子应该显示的数字的算法
+			int kuangNums[8][2] = { { i - 1 ,j - 1},{ i - 1 ,j},{ i - 1 ,j + 1 },{ i ,j - 1 },{ i ,j + 1 },{ i + 1 ,j - 1 },{ i + 1 ,j },{ i + 1 ,j + 1 } };
+			for (size_t m = 0; m < 8; m++)
 			{
-				count = cells[i][j + 1] + cells[i + 1][j] + cells[i + 1][j + 1];
+				if (kuangNums[m][0] == -1 || kuangNums[m][0] == 16 || kuangNums[m][1] == -1 || kuangNums[m][1] == 16)
+				{
+					continue;
+				}
+				count += (cells[kuangNums[m][0]][kuangNums[m][1]]);
 			}
-			if (i==0&&j!=0&&j!=15)
-			{
-
-			}
-			
+			cells[i][j] = -count;
 		}
 	}
 
